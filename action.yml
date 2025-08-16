@@ -1,0 +1,31 @@
+name: 'Deploy to Azure DevOps'
+description: 'Sube el código al repositorio de Azure DevOps'
+inputs:
+  azure_pat:
+    description: 'Azure DevOps Personal Access Token'
+    required: true
+  azure_repo_url:
+    description: 'URL del repo de Azure DevOps (HTTPS)'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+      shell: bash
+
+    - name: Clone and push to Azure DevOps
+      run: |
+        git clone https://pat:${{ inputs.azure_pat }}@${{ inputs.azure_repo_url }} azure-repo
+        rsync -av --exclude='.git' ./ azure-repo/
+        cd azure-repo
+        git add .
+        git commit -m "Deploy from GitHub Actions" || echo "No changes to commit"
+        git push
+      shell: bash
