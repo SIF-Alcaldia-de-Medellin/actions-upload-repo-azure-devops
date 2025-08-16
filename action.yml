@@ -25,6 +25,7 @@ runs:
         git clone https://pat:${{ inputs.azure_pat }}@${{ inputs.azure_repo_url }} azure-repo
         rsync -av --exclude='.git' --exclude='azure-repo' ./ azure-repo/
         cd azure-repo
+        git checkout qa
         git add .
         git commit -m "Deploy from GitHub Actions" || echo "No changes to commit"
         git push
